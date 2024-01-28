@@ -1,9 +1,11 @@
+'use client'
+
 import { authAtom } from '@/state/atoms'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useAtom } from 'jotai'
 import { useEffect } from 'react'
 
-const AuthListener = () => {
+export const AuthListener = () => {
   const [, setUser] = useAtom(authAtom)
 
   const supabase = createClientComponentClient();

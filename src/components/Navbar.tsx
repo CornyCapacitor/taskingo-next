@@ -1,14 +1,16 @@
 'use client'
 
+import { authAtom } from "@/state/atoms"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { useAtom } from "jotai"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 export const Navbar = () => {
   const [toggleDropdown, setToggleDropdown] = useState(false)
-  const [user, setUser] = useState<any | null>(null)
+  const [user, setUser] = useAtom(authAtom)
 
   const router = useRouter()
   const supabase = createClientComponentClient();
@@ -17,33 +19,6 @@ export const Navbar = () => {
     await supabase.auth.signOut()
     router.refresh()
   }
-
-  useEffect(() => {
-    // Data fetch
-    const getUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        setUser(user)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    getUser()
-
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      console.log(event, session)
-      if (event === 'SIGNED_IN') {
-        getUser()
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null)
-      }
-    })
-
-    return () => {
-      authListener.data.subscription.unsubscribe()
-    }
-  }, [supabase.auth])
 
   return (
     <nav className="h-[100px] bg-gray-900 text-white flex items-center justify-between items py-8 px-2">
