@@ -14,7 +14,6 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(true);
 
   const router = useRouter()
-
   const supabase = createClientComponentClient();
 
   const handleSignUp = async () => {
@@ -22,7 +21,7 @@ const LoginPage = () => {
       email,
       password,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`
+        emailRedirectTo: `${location.origin}/login`
       }
     })
     setUser(res.data.user)
@@ -78,7 +77,7 @@ const LoginPage = () => {
     return (
       <main className="h-screen flex items-center justify-center bg-gray-800 p-6 text-white">
         <div className="bg-gray-900 p-8 rounded-lg shadow-md w-96 flex flex-col items-center justify-center gap-5">
-          <h1 className="text-center text-2xl">Hello again <br /><span className="text-blue-600">{user.email}</span></h1>
+          <h1 className="text-center text-2xl">Hello again <br /><span className="text-blue-600">{user.user_metadata.username}</span></h1>
           {verifyInfo &&
             <p className="text-center text-red-600">Check your email in order to authorize your Taskingo account!</p>
           }
@@ -99,8 +98,8 @@ const LoginPage = () => {
         }
         <input type="email" name="email" value={email} placeholder="email" onChange={(e) => setEmail(e.target.value)} className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" />
         <input type="password" name="password" value={password} placeholder="password" onChange={(e) => setPassword(e.target.value)} className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" />
-        <button onClick={handleSignIn} className="w-full p-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none">Sign In</button>
-        <button onClick={handleSignUp} className="w-full p-3 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none">Sign up</button>
+        <button onClick={handleSignIn} className="w-full p-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none">Login</button>
+        <Link href="/signup" className="w-full p-3 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none text-center">Sign Up</Link>
       </div>
     </main>
   )
