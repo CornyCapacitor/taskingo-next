@@ -7,8 +7,6 @@ export default async function Home() {
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
   const { data: { user } } = await supabase.auth.getUser()
 
-  console.log("User", user)
-
   if (!user) {
     return (
       <main className="poppins w-screen flex flex-col gap-3 items-center justify-center">
