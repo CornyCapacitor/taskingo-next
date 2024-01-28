@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import Navbar from "@/components/Navbar";
 
 import "./globals.css";
 
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <link rel="shortcut icon" href="/favicon.svg" />
       <body>
+        <Navbar />
         {children}
       </body>
     </html>
