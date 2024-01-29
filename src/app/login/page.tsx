@@ -16,21 +16,6 @@ const LoginPage = () => {
   const router = useRouter()
   const supabase = createClientComponentClient();
 
-  const handleSignUp = async () => {
-    const res = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${location.origin}/login`
-      }
-    })
-    setUser(res.data.user)
-    router.refresh();
-    setEmail('')
-    setPassword('')
-    setVerifyInfo("You've succesfully signed up! Check your e-mail in order to proceed.")
-  }
-
   const handleSignIn = async () => {
     try {
       const res = await supabase.auth.signInWithPassword({
