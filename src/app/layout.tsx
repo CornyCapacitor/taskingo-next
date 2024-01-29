@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <link rel="shortcut icon" href="/favicon.svg" />
-      <body>
+      <body className="flex flex-col h-screen w-screen overflow-hidden">
         <AuthListener />
         <Navbar />
         {children}
