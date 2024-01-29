@@ -6,10 +6,11 @@ import { useAtom } from "jotai"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export const Navbar = () => {
   const [toggleDropdown, setToggleDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
   const [user] = useAtom(authAtom)
 
   const router = useRouter()
@@ -20,12 +21,26 @@ export const Navbar = () => {
     router.refresh()
   }
 
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setToggleDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   return (
     <nav className="h-[100px] bg-gray-900 text-white flex items-center justify-between items py-8 px-2">
       <section className="flex w-[80px] text-center justify-center"></section>
       <Link href={"/"} className="text-5xl">Taskingo</Link>
       <section className="flex w-[80px] justify-center">
-        <div className="relative inline-block">
+        <div ref={dropdownRef} className="relative inline-block">
           <Image src="hamburger.svg" alt="Dropdown menu" width={50} height={50} className={`hover:cursor-pointer border rounded-md p-2 ${toggleDropdown ? 'border-blue-500' : 'border-transparent'}`} onClick={() => setToggleDropdown(prev => !prev)} />
           {toggleDropdown &&
             <ul className="absolute flex flex-col gap-3 rounded-md bg-gray-700 z-1 min-w-[250px] p-3 mt-2 right-0 text-center dropdown_reveal overflow-hidden">
