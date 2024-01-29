@@ -15,6 +15,7 @@
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
+    "shortid": "^2.2.16",
     "sweetalert2": "^11.10.4"
   },
   "devDependencies": {

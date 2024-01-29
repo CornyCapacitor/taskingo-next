@@ -5,8 +5,9 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useAtom } from 'jotai'
 import { useEffect } from 'react'
 
+
 export const AuthListener = () => {
-  const [, setUser] = useAtom(authAtom)
+  const [user, setUser] = useAtom(authAtom)
 
   const supabase = createClientComponentClient();
 
@@ -22,24 +23,28 @@ export const AuthListener = () => {
 
     const authListener = supabase.auth.onAuthStateChange((event, session) => {
       console.log(event, session)
-      if (event === 'INITIAL_SESSION') {
-        getUser()
-      } else if (event === 'SIGNED_IN') {
-        getUser()
-      } else if (event === 'SIGNED_OUT') {
+
+      if (event === 'SIGNED_OUT') {
         setUser(null)
-      } else if (event === 'TOKEN_REFRESHED') {
-        getUser()
-      } else if (event === 'USER_UPDATED') {
-        getUser()
+        return
       }
+
+      if (event === 'TOKEN_REFRESHED') {
+        getUser()
+        return
+      }
+
+      if (user) {
+        return
+      }
+
+      getUser()
     })
 
     return () => {
       authListener.data.subscription.unsubscribe()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [supabase, setUser, user])
 
   return null
 }

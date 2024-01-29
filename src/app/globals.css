@@ -22,3 +22,11 @@ body {
     height: 312px;
   }
 }
+
+.standard_board {
+  @apply bg-gray-900 text-white hover:bg-gray-700;
+}
+
+.standard_transition {
+  transition: 0.2s;
+}
