@@ -1,6 +1,8 @@
 'use client'
 
+import { authAtom } from "@/state/atoms"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { useAtom } from "jotai"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -8,7 +10,7 @@ import { useEffect, useState } from "react"
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useAtom<any>(authAtom)
   const [verifyInfo, setVerifyInfo] = useState<string | null>(null);
   const [error, setError] = useState<any | null>(null)
   const [loading, setLoading] = useState(true);
@@ -22,7 +24,6 @@ const LoginPage = () => {
         email,
         password,
       })
-      setUser(res.data.user)
       router.refresh();
       setEmail('')
       setPassword('')
@@ -35,13 +36,11 @@ const LoginPage = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.refresh()
-    setUser(null)
   }
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
       setLoading(false)
     }
 
