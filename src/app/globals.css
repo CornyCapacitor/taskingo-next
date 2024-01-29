@@ -9,9 +9,8 @@ body {
   background-color: rgb(31, 41, 55);
 }
 
-.dropdown_animation {
-  overflow: hidden;
-  animation: reveal 0.25s;
+.dropdown_reveal {
+  animation: reveal 0.5s;
 }
 
 @keyframes reveal {
@@ -20,6 +19,6 @@ body {
   }
 
   100% {
-    height: 180px;
+    height: 312px;
   }
 }

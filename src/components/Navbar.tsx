@@ -10,7 +10,7 @@ import { useState } from "react"
 
 export const Navbar = () => {
   const [toggleDropdown, setToggleDropdown] = useState(false)
-  const [user, setUser] = useAtom(authAtom)
+  const [user] = useAtom(authAtom)
 
   const router = useRouter()
   const supabase = createClientComponentClient();
@@ -23,16 +23,16 @@ export const Navbar = () => {
   return (
     <nav className="h-[100px] bg-gray-900 text-white flex items-center justify-between items py-8 px-2">
       <section className="flex w-[80px] text-center justify-center"></section>
-      <h1 className="text-5xl">Taskingo</h1>
+      <Link href={"/"} className="text-5xl">Taskingo</Link>
       <section className="flex w-[80px] justify-center">
         <div className="relative inline-block">
           <Image src="hamburger.svg" alt="Dropdown menu" width={50} height={50} className={`hover:cursor-pointer border rounded-md p-2 ${toggleDropdown ? 'border-blue-500' : 'border-transparent'}`} onClick={() => setToggleDropdown(prev => !prev)} />
           {toggleDropdown &&
-            <ul className="absolute flex flex-col gap-3 rounded-md bg-gray-700 z-1 min-w-[250px] p-3 mt-2 right-0 text-center dropdown_animation">
-              <li>Home</li>
-              <li>Boards</li>
-              <li>About</li>
-              <li>Help</li>
+            <ul className="absolute flex flex-col gap-3 rounded-md bg-gray-700 z-1 min-w-[250px] p-3 mt-2 right-0 text-center dropdown_reveal overflow-hidden">
+              <Link className="w-full p-3 rounded-md bg-gray-800 text-white hover:bg-gray-600 focus:outline-none text-center" href={"/"}>Home</Link>
+              <Link className="w-full p-3 rounded-md bg-gray-800 text-white hover:bg-gray-600 focus:outline-none text-center" href={"/boards"}>Boards</Link>
+              <Link className="w-full p-3 rounded-md bg-gray-800 text-white hover:bg-gray-600 focus:outline-none text-center" href={"/about"}>About</Link>
+              <Link className="w-full p-3 rounded-md bg-gray-800 text-white hover:bg-gray-600 focus:outline-none text-center" href={"/help"}>Help</Link>
               {user ?
                 <button onClick={handleLogout} className="w-full p-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none">Log Out</button>
                 :
