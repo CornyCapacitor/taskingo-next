@@ -10,7 +10,7 @@ import { useEffect, useState } from "react"
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useAtom<any>(authAtom)
+  const [user] = useAtom<any>(authAtom)
   const [verifyInfo, setVerifyInfo] = useState<string | null>(null);
   const [error, setError] = useState<any | null>(null)
   const [loading, setLoading] = useState(true);
