@@ -22,10 +22,16 @@ export const AuthListener = () => {
 
     const authListener = supabase.auth.onAuthStateChange((event, session) => {
       console.log(event, session)
-      if (event === 'SIGNED_IN') {
+      if (event === 'INITIAL_SESSION') {
+        getUser()
+      } else if (event === 'SIGNED_IN') {
         getUser()
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
+      } else if (event === 'TOKEN_REFRESHED') {
+        getUser()
+      } else if (event === 'USER_UPDATED') {
+        getUser()
       }
     })
 
