@@ -65,6 +65,14 @@ const BoardsPage = () => {
     fetchData()
   }, [user])
 
+  if (!user) {
+    return (
+      <main className="poppins w-screen flex flex-wrap gap-2 items-start justify-center p-5 text-center">
+        <span className="text-1xl text-white">Free user content</span>
+      </main>
+    )
+  }
+
   return (
     <main className="poppins w-screen flex flex-wrap gap-2 items-start justify-center p-5 text-center">
       {boards && boards.map((board) => (
