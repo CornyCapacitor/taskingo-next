@@ -28,7 +28,7 @@ const LoginPage = () => {
       setPassword('')
     } catch (error) {
       setError(error)
-      console.log(error)
+      console.error(error)
     }
   }
 
