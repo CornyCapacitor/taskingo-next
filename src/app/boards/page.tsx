@@ -3,7 +3,6 @@
 import { Board } from "@/components/Board"
 import { authAtom } from "@/state/atoms"
 import { useAtom } from "jotai"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import supabase from "../config/supabaseClient"
@@ -18,36 +17,35 @@ const BoardsPage = () => {
   const [boards, setBoards] = useState<Board[]>()
   const [user] = useAtom(authAtom)
 
-  const router = useRouter()
-
   const handleCreateNewBoard = (e: React.MouseEvent<HTMLDivElement>) => {
-    // e.preventDefault()
-    // if (user && !Object.keys(user).length) return
+    e.preventDefault()
+    if (user && !Object.keys(user).length) return
 
-    // const shortid = require('shortid')
-    // const uniqueId = shortid.generate()
-    // let updateValue: Board[] | Board
+    const shortid = require('shortid')
+    const uniqueId = shortid.generate()
+    let updateValue: Board[] | Board
 
-    // if (boards) {
-    //   const val = [...boards, { id: uniqueId, name: "New Board", theme: "standard_board" }]
-    //   updateValue = val
-    // } else {
-    //   const val = { id: uniqueId, name: "New Board", theme: "standard_board" }
-    //   updateValue = val
-    // }
+    if (boards) {
+      const val = [...boards, { id: uniqueId, name: "New Board", theme: "standard_board" }]
+      updateValue = val
+    } else {
+      const val = { id: uniqueId, name: "New Board", theme: "standard_board" }
+      updateValue = val
+    }
 
-    // const updateData = async () => {
-    //   const { data, error } = await supabase
-    //     .from('users_boards')
-    //     .update(updateValue)
-    //     .eq('user_id', user?.id)
-    //     .select()
-    // }
+    const updateData = async () => {
+      const { data } = await supabase
+        .from('users_boards')
+        .update({ 'boards': updateValue })
+        .eq('user_id', user?.id)
+        .select()
 
-    // updateData();
-    // router.refresh()
+      if (data) {
+        setBoards(data[0].boards)
+      }
+    }
 
-    // console.log(user?.id)
+    updateData();
   }
 
   useEffect(() => {
@@ -60,7 +58,6 @@ const BoardsPage = () => {
         .eq('user_id', user?.id)
 
       if (data?.length) {
-        console.log(data)
         setBoards(data[0].boards)
       }
     }
