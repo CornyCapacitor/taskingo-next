@@ -29,7 +29,7 @@ const BoardsPage = () => {
       const val = [...boards, { id: uniqueId, name: "New Board", theme: "standard_board" }]
       updateValue = val
     } else {
-      const val = { id: uniqueId, name: "New Board", theme: "standard_board" }
+      const val = [{ id: uniqueId, name: "New Board", theme: "standard_board" }]
       updateValue = val
     }
 
@@ -49,7 +49,15 @@ const BoardsPage = () => {
   }
 
   useEffect(() => {
-    if (user && !Object.keys(user).length) return
+    if (!user) {
+      return
+    }
+
+    const createUserDatabase = async () => {
+      await supabase
+        .from('users_boards')
+        .insert({ user_id: user?.id, boards: [] })
+    }
 
     const fetchData = async () => {
       const { data } = await supabase
@@ -59,6 +67,8 @@ const BoardsPage = () => {
 
       if (data?.length) {
         setBoards(data[0].boards)
+      } else if (!data?.length) {
+        createUserDatabase()
       }
     }
 
