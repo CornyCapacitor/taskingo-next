@@ -51,12 +51,18 @@ const LoginPage = () => {
           title: "Signed in succesfully"
         })
       }
-
-      setEmail('')
-      setPassword('')
     } catch (error) {
       setError(error)
       console.error(error)
+    }
+    setEmail('')
+    setPassword('')
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault
+    if (event.key === "Enter") {
+      handleSignIn();
     }
   }
 
@@ -109,7 +115,7 @@ const LoginPage = () => {
           <p className="text-center text-red-500">Error: {error.message}</p>
         }
         <input type="email" name="email" value={email} placeholder="email" onChange={(e) => setEmail(e.target.value)} className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" />
-        <input type="password" name="password" value={password} placeholder="password" onChange={(e) => setPassword(e.target.value)} className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" />
+        <input type="password" name="password" value={password} placeholder="password" onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => handleKeyDown(e)} className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" />
         <button onClick={handleSignIn} className="w-full p-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none">Login</button>
         <Link href="/signup" className="w-full p-3 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none text-center">Sign Up</Link>
       </div>
