@@ -46,8 +46,9 @@ const BoardPage = () => {
   return (
     <div className="poppins w-screen flex flex-col flex-wrap gap-2 items-start justify-center p-5 text-center text-white">
       <h1>Board Page</h1>
+      {/* Temporary information for coding purpose */}
+      <p>Board name: {board?.name}</p>
       <p>User id: {user?.id}</p>
-      <p>Params id: {params.id}</p>
       <p>Board id: {board?.id}</p>
     </div>
   )
