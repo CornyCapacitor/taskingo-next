@@ -8,10 +8,18 @@ import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import supabase from "../config/supabaseClient"
 
+type Task = {
+  name: string,
+  description?: string,
+  // Unfinished, In progress, Finished
+  status: string,
+}
+
 type Board = {
   id: string,
   name: string,
   theme: string,
+  lists: Task[],
 }
 
 const BoardsPage = () => {
@@ -49,11 +57,11 @@ const BoardsPage = () => {
 
     if (boards) {
       // If at least 1 board
-      const val = [...boards, { id: uniqueId, name: `${boardName ? boardName : "New board"}`, theme: "standard_board" }]
+      const val = [...boards, { id: uniqueId, name: `${boardName ? boardName : "New board"}`, theme: "standard_board", lists: [] }]
       updateValue = val
     } else {
       // If no boards
-      const val = [{ id: uniqueId, name: `${boardName ? boardName : "New board"}`, theme: "standard_board" }]
+      const val = [{ id: uniqueId, name: `${boardName ? boardName : "New board"}`, theme: "standard_board", lists: [] }]
       updateValue = val
     }
 
