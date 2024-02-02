@@ -6,6 +6,7 @@ import { useAtom } from "jotai"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import Swal from "sweetalert2"
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -17,13 +18,40 @@ const LoginPage = () => {
   const router = useRouter()
   const supabase = createClientComponentClient();
 
+  const LoginToast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true,
+    color: "#fff",
+    background: "#111827",
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+      toast.onclick = () => Swal.close();
+    }
+  })
+
   const handleSignIn = async () => {
     try {
       const res = await supabase.auth.signInWithPassword({
         email,
         password,
       })
-      router.refresh();
+
+      if (res.error) {
+        LoginToast.fire({
+          icon: "error",
+          title: `${res.error.message}`,
+        })
+      } else {
+        LoginToast.fire({
+          icon: "success",
+          title: "Signed in succesfully"
+        })
+      }
+
       setEmail('')
       setPassword('')
     } catch (error) {
@@ -35,6 +63,10 @@ const LoginPage = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.refresh()
+    LoginToast.fire({
+      icon: "success",
+      title: "Logged out succesfully"
+    })
   }
 
   useEffect(() => {
