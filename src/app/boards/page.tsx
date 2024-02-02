@@ -26,14 +26,17 @@ const BoardsPage = () => {
     let updateValue: Board[] | Board
 
     if (boards) {
+      // If at least 1 board
       const val = [...boards, { id: uniqueId, name: "New Board", theme: "standard_board" }]
       updateValue = val
     } else {
+      // If no boards
       const val = [{ id: uniqueId, name: "New Board", theme: "standard_board" }]
       updateValue = val
     }
 
     const updateData = async () => {
+      // Updating data to database
       const { data } = await supabase
         .from('users_boards')
         .update({ 'boards': updateValue })
@@ -60,14 +63,17 @@ const BoardsPage = () => {
     }
 
     const fetchData = async () => {
+      // Fetching the data from database
       const { data } = await supabase
         .from('users_boards')
         .select()
         .eq('user_id', user?.id)
 
       if (data?.length) {
+        // If boards
         setBoards(data[0].boards)
       } else if (!data?.length) {
+        // If no boards
         createUserDatabase()
       }
     }
