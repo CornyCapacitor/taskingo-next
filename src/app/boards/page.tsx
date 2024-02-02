@@ -5,6 +5,7 @@ import { authAtom } from "@/state/atoms"
 import { useAtom } from "jotai"
 import { useEffect, useState } from "react"
 
+import Swal from "sweetalert2"
 import supabase from "../config/supabaseClient"
 
 type Board = {
@@ -17,8 +18,29 @@ const BoardsPage = () => {
   const [boards, setBoards] = useState<Board[]>()
   const [user] = useAtom(authAtom)
 
-  const handleCreateNewBoard = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault()
+  const handleCreateNewBoard = () => {
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: 'Enter new board name',
+      input: "text",
+      inputPlaceholder: "New board",
+      showConfirmButton: true,
+      confirmButtonText: "Create",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        createNewBoard(result.value)
+        return
+      } else {
+        return
+      }
+    })
+  }
+
+  const createNewBoard = (boardName: string) => {
     if (user && !Object.keys(user).length) return
 
     const shortid = require('shortid')
@@ -27,11 +49,11 @@ const BoardsPage = () => {
 
     if (boards) {
       // If at least 1 board
-      const val = [...boards, { id: uniqueId, name: "New Board", theme: "standard_board" }]
+      const val = [...boards, { id: uniqueId, name: `${boardName ? boardName : "New board"}`, theme: "standard_board" }]
       updateValue = val
     } else {
       // If no boards
-      const val = [{ id: uniqueId, name: "New Board", theme: "standard_board" }]
+      const val = [{ id: uniqueId, name: `${boardName ? boardName : "New board"}`, theme: "standard_board" }]
       updateValue = val
     }
 
