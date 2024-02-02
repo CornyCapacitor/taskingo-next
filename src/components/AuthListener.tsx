@@ -22,7 +22,8 @@ export const AuthListener = () => {
     }
 
     const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      console.log(event, session)
+      // Temporarily set off
+      // console.log(event, session)
 
       if (event === 'SIGNED_OUT') {
         setUser(null)
