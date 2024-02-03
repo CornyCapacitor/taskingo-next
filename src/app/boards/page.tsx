@@ -8,20 +8,6 @@ import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import supabase from "../config/supabaseClient"
 
-type Task = {
-  name: string,
-  description?: string,
-  // Unfinished, In progress, Finished
-  status: string,
-}
-
-type Board = {
-  id: string,
-  name: string,
-  theme: string,
-  lists: Task[],
-}
-
 const BoardsPage = () => {
   const [boards, setBoards] = useState<Board[]>()
   const [user] = useAtom(authAtom)
