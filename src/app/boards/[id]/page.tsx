@@ -110,7 +110,7 @@ const BoardPage = () => {
   return (
     <div className="poppins w-screen flex flex-row flex-wrap gap-2 items-start justify-center p-5 text-center text-white">
       {board && board.lists.map((list) => (
-        <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board" key={list.id}>
+        <div className="flex flex-col items-center justify-center rounded-3xl w-[350px] py-2 px-3 bg-gray-900 text-white" key={list.id}>
           <h1 className="text-1xl">{list.name}</h1>
           {list.tasks.map((task) => (
             <div key={task.id}>
@@ -119,6 +119,7 @@ const BoardPage = () => {
               <span className="text-1xl">{task.status}</span>
             </div>
           ))}
+          <div className="rounded-full cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%]">+ Create new task</div>
         </div>
       ))}
       <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board" onClick={() => handleCreateNewList()}>
