@@ -16,8 +16,6 @@ const BoardPage = () => {
   useEffect(() => {
     if (user && !Object.keys(user).length) return
 
-    const boardId = params.id
-
     const fetchData = async () => {
       const { data } = await supabase
         .from('users_boards')
@@ -68,7 +66,6 @@ const BoardPage = () => {
     // Generating new board id
     const shortid = require('shortid')
     const uniqueId = shortid.generate()
-    let updateValue: Board
 
     // Finding board index
     const boardIndex = boards?.findIndex(board => board.id === params.id)
@@ -119,7 +116,7 @@ const BoardPage = () => {
               <span className="text-1xl">{task.status}</span>
             </div>
           ))}
-          <div className="rounded-full cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%]">+ Create new task</div>
+          <div className="rounded-full cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%] py-1">+ Create new task</div>
         </div>
       ))}
       <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board" onClick={() => handleCreateNewList()}>
