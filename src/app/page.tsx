@@ -1,12 +1,11 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+'use client'
+
+import { authAtom } from "@/state/atoms";
+import { useAtom } from "jotai";
 import Link from "next/link";
 
-export default async function Home() {
-  // Reading the user directly* from the session
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
-  const { data: { user } } = await supabase.auth.getUser()
+export default function Home() {
+  const [user] = useAtom(authAtom)
 
   if (!user) {
     return (
