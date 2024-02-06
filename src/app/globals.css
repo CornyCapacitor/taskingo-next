@@ -9,6 +9,20 @@ body {
   background-color: rgb(31, 41, 55);
 }
 
+.board_dropdown_reveal {
+  animation: board_reveal 0.5s;
+}
+
+@keyframes board_reveal {
+  0% {
+    height: 0px;
+  }
+
+  100% {
+    height: 168px;
+  }
+}
+
 .dropdown_reveal {
   animation: reveal 0.5s;
 }
@@ -29,4 +43,40 @@ body {
 
 .standard_transition {
   transition: 0.2s;
+}
+
+.custom_swal_input {
+  width: 95%;
+  height: 47.25px;
+  margin: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.custom_swal_select {
+  width: 95%;
+  height: 47.25px;
+  background-color: transparent;
+  padding: 0px 12px;
+  font-size: 18px;
+  margin: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
+  border: solid 1px #d9d9d9;
+  border-radius: 4px;
+  outline: none;
+}
+
+.custom_swal_option {
+  display: flex;
+  width: 100%;
+  align-items: space-between;
+  justify-content: space-between;
+  background-color: transparent;
+  color: black;
+}
+
+.option_gray {
+  background-color: #808080;
+  color: #ff0000;
 }
