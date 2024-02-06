@@ -9,15 +9,17 @@ import { useEffect, useRef, useState } from 'react'
 import Swal from 'sweetalert2'
 
 const BoardPage = () => {
-  const params = useParams()
   const [user] = useAtom(authAtom)
   const [boards, setBoards] = useState<Board[]>([])
   const [board, setBoard] = useState<Board>()
-
   const [toggleDropdown, setToggleDropdown] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const [loadingMessage, setLoadingMessage] = useState('')
 
+  const params = useParams()
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
   const router = useRouter()
+
+  // Fetch boards/board data
 
   useEffect(() => {
     if (user && !Object.keys(user).length) return
@@ -37,6 +39,8 @@ const BoardPage = () => {
     fetchData()
   }, [user, params.id])
 
+  // Single board object set
+
   useEffect(() => {
     const foundBoard = boards.find((board: { id: string }) => board.id === params.id)
     if (foundBoard) {
@@ -44,7 +48,155 @@ const BoardPage = () => {
     }
   }, [boards, params.id])
 
+  // Dropdown hide
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setToggleDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  // Reusable pieces of code
+
+  const updateData = async (updatedBoards: Board[], successScenario: any, errorScenario: any) => {
+    if (user && !Object.keys(user).length) return
+
+    const { data, error } = await supabase
+      .from('users_boards')
+      .update({ 'boards': updatedBoards })
+      .eq('user_id', user?.id)
+      .select()
+
+    if (data) {
+      setBoards(data[0].boards)
+      successScenario()
+    }
+
+    if (error) {
+      errorScenario()
+    }
+  }
+
+  const BoardToast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true,
+    color: "#fff",
+    background: "#111827",
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+      toast.onclick = () => Swal.close();
+    }
+  })
+
+
+  // Board functions
+
+  const handleEditBoard = (boardId: string, boardName: string) => {
+    if (user && !Object.keys(user).length) return
+
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Editing "${boardName}"`,
+      input: 'text',
+      inputValue: boardName,
+      inputPlaceholder: 'New board',
+      showConfirmButton: true,
+      confirmButtonText: "Save",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (result.value !== boardName) {
+          const newBoardName = result.value
+          editBoard(boardId, newBoardName)
+        } else {
+          return
+        }
+      } else {
+        return
+      }
+    })
+  }
+
+  const editBoard = (boardId: string, newBoardName: string) => {
+    if (user && !Object.keys(user).length) return
+
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
+
+    const updatedBoards = boards
+    updatedBoards[boardIndex].name = newBoardName
+
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: 'Board updated'
+    })
+
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to update the board'
+    })
+
+    updateData(updatedBoards, successToast, errorToast)
+  }
+
+  const handleDeleteBoard = (boardId: string, boardName: string) => {
+    if (user && !Object.keys(user).length) return
+
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Are you sure you want to delete "${boardName}"? You can't revert this change.`,
+      showConfirmButton: true,
+      confirmButtonText: "Yes",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteBoard(boardId)
+      } else {
+        return
+      }
+    })
+  }
+
+  const deleteBoard = (boardId: string) => {
+    if (user && !Object.keys(user).length) return
+
+    const updatedBoards = boards.filter(board => board.id !== boardId)
+
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: 'Board deleted'
+    })
+
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to delete the board'
+    })
+
+    updateData(updatedBoards, successToast, errorToast).then(() => router.push('/boards'))
+  }
+
+  // List functions
+
   const handleCreateNewList = () => {
+    if (user && !Object.keys(user).length) return
+
     Swal.fire({
       color: "#fff",
       background: "#111827",
@@ -71,13 +223,7 @@ const BoardPage = () => {
 
     const shortid = require('shortid')
     const uniqueId = shortid.generate()
-
     const boardIndex = boards?.findIndex(board => board.id === params.id)
-
-    if (boardIndex === -1) {
-      console.error("Board not found with id:", params.id)
-      return
-    }
 
     const newList: List = {
       id: uniqueId,
@@ -90,22 +236,122 @@ const BoardPage = () => {
       ...updatedBoards[boardIndex], lists: [...updatedBoards[boardIndex].lists, newList]
     }
 
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: `${listName} list created`
+    })
 
-      if (data) {
-        setBoards(data[0].boards)
-      }
-    }
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to create new list'
+    })
 
-    updateData()
+    updateData(updatedBoards, successToast, errorToast)
   }
 
+  const handleEditList = (boardId: string, listId: string, listName: string) => {
+    if (user && !Object.keys(user).length) return
+
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Editing "${listName}"`,
+      input: 'text',
+      inputValue: listName,
+      inputPlaceholder: 'New list',
+      showConfirmButton: true,
+      confirmButtonText: "Save",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      showDenyButton: true,
+      denyButtonText: "Delete list",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (result.value !== listName) {
+          const newListName = result.value
+          editList(boardId, listId, newListName)
+        } else {
+          return
+        }
+      } else if (result.isDenied) {
+        handleDeleteList(boardId, listId, listName)
+      } else {
+        return
+      }
+    })
+  }
+
+  const editList = (boardId: string, listId: string, newListName: string) => {
+    if (user && !Object.keys(user).length) return
+
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
+    const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
+
+    const updatedBoards = boards
+    updatedBoards[boardIndex].lists[listIndex].name = newListName
+
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: 'List updated'
+    })
+
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to update the list'
+    })
+
+    updateData(updatedBoards, successToast, errorToast)
+  }
+
+  const handleDeleteList = (boardId: string, listId: string, listName: string) => {
+    if (user && !Object.keys(user).length) return
+
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Are you sure you want to delete "${listName}"? You can't revert this change.`,
+      showConfirmButton: true,
+      confirmButtonText: "Yes",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteList(boardId, listId)
+      }
+    })
+  }
+
+  const deleteList = (boardId: string, listId: string) => {
+    if (user && !Object.keys(user).length) return
+
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
+
+    const updatedBoards = boards
+    updatedBoards[boardIndex] = {
+      ...updatedBoards[boardIndex],
+      lists: updatedBoards[boardIndex].lists.filter(list => list.id !== listId)
+    }
+
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: 'List deleted'
+    })
+
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to delete the list'
+    })
+
+    updateData(updatedBoards, successToast, errorToast)
+  }
+
+  // Task functions
+
   const handleCreateNewTask = (boardId: string, listId: string) => {
+    if (user && !Object.keys(user).length) return
+
     Swal.fire({
       color: "#fff",
       background: "#111827",
@@ -139,7 +385,6 @@ const BoardPage = () => {
 
           createNewTask(boardId, listId, taskName, taskDescription, taskStatus)
         } else {
-          console.error("Can't get the values from alert inputs, returning")
           return
         }
         return
@@ -154,9 +399,7 @@ const BoardPage = () => {
 
     const shortid = require('shortid')
     const uniqueId = shortid.generate()
-
     const boardIndex = boards?.findIndex(board => board.id === boardId)
-
     const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
 
     const newTask: Task = {
@@ -171,22 +414,22 @@ const BoardPage = () => {
       ...updatedBoards[boardIndex].lists[listIndex], tasks: [...updatedBoards[boardIndex].lists[listIndex].tasks, newTask]
     }
 
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: 'Task created'
+    })
 
-      if (data) {
-        setBoards(data[0].boards)
-      }
-    }
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to create new task'
+    })
 
-    updateData()
+    updateData(updatedBoards, successToast, errorToast)
   }
 
   const handleEditTask = (boardId: string, listId: string, taskId: string, taskName: string, taskDescription: string | undefined, taskStatus: string) => {
+    if (user && !Object.keys(user).length) return
+
     Swal.fire({
       color: "#fff",
       background: "#111827",
@@ -245,10 +488,10 @@ const BoardPage = () => {
   }
 
   const editTask = (boardId: string, listId: string, taskId: string, taskName: string, taskDescription: string | undefined, taskStatus: string) => {
+    if (user && !Object.keys(user).length) return
+
     const boardIndex = boards?.findIndex(board => board.id === boardId)
-
     const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
-
     const taskIndex = boards[boardIndex].lists[listIndex].tasks.findIndex(task => task.id === taskId)
 
     const updatedTask = {
@@ -263,22 +506,22 @@ const BoardPage = () => {
       ...updatedBoards[boardIndex].lists[listIndex].tasks[taskIndex] = updatedTask
     }
 
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: 'Task updated'
+    })
 
-      if (data) {
-        setBoards(data[0].boards)
-      }
-    }
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to update the task'
+    })
 
-    updateData()
+    updateData(updatedBoards, successToast, errorToast)
   }
 
   const handleDeleteTask = (boardId: string, listId: string, taskId: string, taskName: string) => {
+    if (user && !Object.keys(user).length) return
+
     Swal.fire({
       color: "#fff",
       background: "#111827",
@@ -296,8 +539,9 @@ const BoardPage = () => {
   }
 
   const deleteTask = (boardId: string, listId: string, taskId: string) => {
-    const boardIndex = boards?.findIndex(board => board.id === boardId)
+    if (user && !Object.keys(user).length) return
 
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
     const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
 
     const updatedBoards = boards
@@ -306,216 +550,25 @@ const BoardPage = () => {
       tasks: updatedBoards[boardIndex].lists[listIndex].tasks.filter(task => task.id !== taskId)
     }
 
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
-
-      if (data) {
-        setBoards(data[0].boards)
-      }
-    }
-
-    updateData()
-  }
-
-  const handleEditList = (boardId: string, listId: string, listName: string) => {
-    Swal.fire({
-      color: "#fff",
-      background: "#111827",
-      title: `Editing "${listName}"`,
-      input: 'text',
-      inputValue: listName,
-      inputPlaceholder: 'New list',
-      showConfirmButton: true,
-      confirmButtonText: "Save",
-      confirmButtonColor: "#2563eb",
-      showCancelButton: true,
-      cancelButtonText: "Cancel",
-      showDenyButton: true,
-      denyButtonText: "Delete list",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        if (result.value !== listName) {
-          const newListName = result.value
-          editList(boardId, listId, newListName)
-        } else {
-          return
-        }
-      } else if (result.isDenied) {
-        handleDeleteList(boardId, listId, listName)
-      } else {
-        return
-      }
+    const successToast = () => BoardToast.fire({
+      icon: 'success',
+      title: `Task deleted`
     })
-  }
 
-  const editList = (boardId: string, listId: string, newListName: string) => {
-    const boardIndex = boards?.findIndex(board => board.id === boardId)
-
-    const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
-
-    console.log("Board", boards[boardIndex])
-    console.log("List index", listIndex)
-
-    const updatedBoards = boards
-    updatedBoards[boardIndex].lists[listIndex].name = newListName
-
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
-
-      if (data) {
-        setBoards(data[0].boards)
-      }
-    }
-
-    updateData()
-  }
-
-  const handleDeleteList = (boardId: string, listId: string, listName: string) => {
-    Swal.fire({
-      color: "#fff",
-      background: "#111827",
-      title: `Are you sure you want to delete "${listName}"? You can't revert this change.`,
-      showConfirmButton: true,
-      confirmButtonText: "Yes",
-      confirmButtonColor: "#2563eb",
-      showCancelButton: true,
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteList(boardId, listId)
-      }
+    const errorToast = () => BoardToast.fire({
+      icon: 'error',
+      title: 'Failed to delete the task'
     })
+
+    updateData(updatedBoards, successToast, errorToast)
   }
 
-  const deleteList = (boardId: string, listId: string) => {
-    const boardIndex = boards?.findIndex(board => board.id === boardId)
-
-    const updatedBoards = boards
-    updatedBoards[boardIndex] = {
-      ...updatedBoards[boardIndex],
-      lists: updatedBoards[boardIndex].lists.filter(list => list.id !== listId)
-    }
-
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
-
-      if (data) {
-        setBoards(data[0].boards)
-      }
-    }
-
-    updateData()
-  }
-
-  useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setToggleDropdown(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-
-  const handleEditBoard = (boardId: string, boardName: string) => {
-    Swal.fire({
-      color: "#fff",
-      background: "#111827",
-      title: `Editing "${boardName}"`,
-      input: 'text',
-      inputValue: boardName,
-      inputPlaceholder: 'New board',
-      showConfirmButton: true,
-      confirmButtonText: "Save",
-      confirmButtonColor: "#2563eb",
-      showCancelButton: true,
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        if (result.value !== boardName) {
-          const newBoardName = result.value
-          editBoard(boardId, newBoardName)
-        } else {
-          return
-        }
-      } else {
-        return
-      }
-    })
-  }
-
-  const editBoard = (boardId: string, newBoardName: string) => {
-    const boardIndex = boards?.findIndex(board => board.id === boardId)
-
-    const updatedBoards = boards
-    updatedBoards[boardIndex].name = newBoardName
-
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
-
-      if (data) {
-        setBoards(data[0].boards)
-      }
-    }
-
-    updateData()
-  }
-
-  const handleDeleteBoard = (boardId: string, boardName: string) => {
-    Swal.fire({
-      color: "#fff",
-      background: "#111827",
-      title: `Are you sure you want to delete "${boardName}"? You can't revert this change.`,
-      showConfirmButton: true,
-      confirmButtonText: "Yes",
-      confirmButtonColor: "#2563eb",
-      showCancelButton: true,
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteBoard(boardId)
-      } else {
-        return
-      }
-    })
-  }
-
-  const deleteBoard = (boardId: string) => {
-    const updatedBoards = boards.filter(board => board.id !== boardId)
-
-    const updateData = async () => {
-      const { data } = await supabase
-        .from('users_boards')
-        .update({ 'boards': updatedBoards })
-        .eq('user_id', user?.id)
-        .select()
-
-      if (data) {
-        router.push('/boards')
-      }
-    }
-
-    updateData()
+  if (!user || !boards || !board) {
+    return (
+      <div className="poppins w-screen h-full flex flex-wrap gap-2 items-center justify-center p-5 text-center">
+        <h1 className="text-3xl text-white">Loading board...</h1>
+      </div>
+    )
   }
 
   return (

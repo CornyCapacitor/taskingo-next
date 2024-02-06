@@ -97,11 +97,11 @@ const BoardsPage = () => {
     fetchData()
   }, [user])
 
-  if (!user) {
+  if (!user || !boards) {
     return (
-      <main className="poppins w-screen flex flex-wrap gap-2 items-start justify-center p-5 text-center">
-        <span className="text-1xl text-white">Free user content</span>
-      </main>
+      <div className="poppins w-screen h-full flex flex-wrap gap-2 items-center justify-center p-5 text-center">
+        <h1 className="text-3xl text-white">Loading boards...</h1>
+      </div>
     )
   }
 
