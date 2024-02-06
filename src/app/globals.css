@@ -9,6 +9,20 @@ body {
   background-color: rgb(31, 41, 55);
 }
 
+.board_dropdown_reveal {
+  animation: board_reveal 0.5s;
+}
+
+@keyframes board_reveal {
+  0% {
+    height: 0px;
+  }
+
+  100% {
+    height: 168px;
+  }
+}
+
 .dropdown_reveal {
   animation: reveal 0.5s;
 }

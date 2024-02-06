@@ -3,8 +3,9 @@
 import supabase from '@/app/config/supabaseClient'
 import { authAtom } from '@/state/atoms'
 import { useAtom } from 'jotai'
-import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import Swal from 'sweetalert2'
 
 const BoardPage = () => {
@@ -12,6 +13,11 @@ const BoardPage = () => {
   const [user] = useAtom(authAtom)
   const [boards, setBoards] = useState<Board[]>([])
   const [board, setBoard] = useState<Board>()
+
+  const [toggleDropdown, setToggleDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
+
+  const router = useRouter()
 
   useEffect(() => {
     if (user && !Object.keys(user).length) return
@@ -413,9 +419,126 @@ const BoardPage = () => {
     updateData()
   }
 
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setToggleDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  const handleEditBoard = (boardId: string, boardName: string) => {
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Editing "${boardName}"`,
+      input: 'text',
+      inputValue: boardName,
+      inputPlaceholder: 'New board',
+      showConfirmButton: true,
+      confirmButtonText: "Save",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (result.value !== boardName) {
+          const newBoardName = result.value
+          editBoard(boardId, newBoardName)
+        } else {
+          return
+        }
+      } else {
+        return
+      }
+    })
+  }
+
+  const editBoard = (boardId: string, newBoardName: string) => {
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
+
+    const updatedBoards = boards
+    updatedBoards[boardIndex].name = newBoardName
+
+    const updateData = async () => {
+      const { data } = await supabase
+        .from('users_boards')
+        .update({ 'boards': updatedBoards })
+        .eq('user_id', user?.id)
+        .select()
+
+      if (data) {
+        setBoards(data[0].boards)
+      }
+    }
+
+    updateData()
+  }
+
+  const handleDeleteBoard = (boardId: string, boardName: string) => {
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Are you sure you want to delete "${boardName}"? You can't revert this change.`,
+      showConfirmButton: true,
+      confirmButtonText: "Yes",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteBoard(boardId)
+      } else {
+        return
+      }
+    })
+  }
+
+  const deleteBoard = (boardId: string) => {
+    const updatedBoards = boards.filter(board => board.id !== boardId)
+
+    const updateData = async () => {
+      const { data } = await supabase
+        .from('users_boards')
+        .update({ 'boards': updatedBoards })
+        .eq('user_id', user?.id)
+        .select()
+
+      if (data) {
+        router.push('/boards')
+      }
+    }
+
+    updateData()
+  }
+
   return (
-    <div className="poppins w-screen flex flex-row flex-wrap gap-2 items-start justify-center text-center text-white">
-      <h1 className="text-2xl flex text-center justify-center w-full bg-black py-1">{board?.name}</h1>
+    <div className="poppins w-screen flex flex-row flex-wrap items-start justify-center text-center text-white">
+      {board && (
+        <div className="flex text-center justify-between items-center w-full bg-black py-1 px-5">
+          <h1 className="text-2xl">{board?.name}</h1>
+          <div ref={dropdownRef} className="relative inline-block">
+            <Image src="hamburger.svg" alt="Dropdown menu" width={50} height={50} className={`hover:cursor-pointer border rounded-md p-2 z-1 ${toggleDropdown ? 'border-blue-500' : 'border-transparent'}`} onClick={() => setToggleDropdown(prev => !prev)} />
+            {toggleDropdown &&
+              <ul className="absolute flex flex-col gap-3 rounded-md bg-gray-700 z-10 min-w-[250px] p-3 mt-2 right-0 text-center board_dropdown_reveal overflow-hidden">
+                <h1>Board options</h1>
+                <button className="w-full p-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none text-center" onClick={() => handleEditBoard(board?.id, board?.name)}>
+                  Edit board
+                </button>
+                <button className="w-full p-3 rounded-md bg-red-600 text-white hover:bg-red-700 focus:outline-none text-center" onClick={() => handleDeleteBoard(board?.id, board?.name)}>
+                  Delete board
+                </button>
+              </ul>
+            }
+          </div>
+        </div>
+      )}
       {board && board.lists.map((list) => (
         <div className="flex flex-col items-center justify-center rounded-3xl w-[350px] py-2 px-3 bg-gray-900 text-white gap-1" key={list.id}>
           <h1 className="text-1xl py-1 hover:bg-gray-700 rounded-3xl standard_transition w-full cursor-pointer px-2" onClick={() => handleEditList(board.id, list.id, list.name)}>{list.name}</h1>
@@ -433,7 +556,7 @@ const BoardPage = () => {
           <div className="rounded-full cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%] py-1 text-blue-500" onClick={() => handleCreateNewTask(board.id, list.id)}>+ Create new task</div>
         </div>
       ))}
-      <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board" onClick={() => handleCreateNewList()}>
+      <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board mt-2" onClick={() => handleCreateNewList()}>
         <h1 className="text-1xl text-blue-500">+ Create new list</h1>
       </div>
     </div>
