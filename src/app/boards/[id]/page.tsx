@@ -209,7 +209,7 @@ const BoardPage = () => {
         }
       },
       showConfirmButton: true,
-      confirmButtonText: "Create",
+      confirmButtonText: "Save",
       confirmButtonColor: "#2563eb",
       showCancelButton: true,
       cancelButtonText: "Cancel",
@@ -268,11 +268,73 @@ const BoardPage = () => {
     updateData()
   }
 
+  const handleEditList = (boardId: string, listId: string, listName: string) => {
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Editing "${listName}"`,
+      input: 'text',
+      inputValue: listName,
+      inputPlaceholder: 'New list',
+      showConfirmButton: true,
+      confirmButtonText: "Save",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      showDenyButton: true,
+      denyButtonText: "Delete list",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (result.value !== listName) {
+          const newListName = result.value
+          editList(boardId, listId, newListName)
+        } else {
+          return
+        }
+      } else if (result.isDenied) {
+        handleDeleteList(boardId, listId)
+      } else {
+        return
+      }
+    })
+  }
+
+  const editList = (boardId: string, listId: string, newListName: string) => {
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
+
+    const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
+
+    console.log("Board", boards[boardIndex])
+    console.log("List index", listIndex)
+
+    const updatedBoards = boards
+    updatedBoards[boardIndex].lists[listIndex].name = newListName
+
+    const updateData = async () => {
+      const { data } = await supabase
+        .from('users_boards')
+        .update({ 'boards': updatedBoards })
+        .eq('user_id', user?.id)
+        .select()
+
+      if (data) {
+        setBoards(data[0].boards)
+      }
+    }
+
+    updateData()
+  }
+
+  const handleDeleteList = (boardId: string, listId: string) => {
+    return
+  }
+
   return (
-    <div className="poppins w-screen flex flex-row flex-wrap gap-2 items-start justify-center p-5 text-center text-white">
+    <div className="poppins w-screen flex flex-row flex-wrap gap-2 items-start justify-center text-center text-white">
+      <h1 className="text-2xl flex text-center justify-center w-full bg-black py-1">{board?.name}</h1>
       {board && board.lists.map((list) => (
         <div className="flex flex-col items-center justify-center rounded-3xl w-[350px] py-2 px-3 bg-gray-900 text-white gap-1" key={list.id}>
-          <h1 className="text-1xl py-1">{list.name}</h1>
+          <h1 className="text-1xl py-1 hover:bg-gray-700 rounded-3xl standard_transition w-full cursor-pointer px-2" onClick={() => handleEditList(board.id, list.id, list.name)}>{list.name}</h1>
           {list.tasks.map((task) => (
             <div className="flex flex-col rounded-2xl cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%] py-0 text-start" key={task.id} onClick={() => handleEditTask(board.id, list.id, task.id, task.name, task.description, task.status)}>
               <div className="flex justify-between items-center">
