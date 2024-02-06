@@ -184,7 +184,7 @@ const BoardPage = () => {
     Swal.fire({
       color: "#fff",
       background: "#111827",
-      title: `Editing ${taskName} task`,
+      title: `Editing "${taskName}"`,
       html: `
       <input type="text" id="taskName" placeholder="New task name" class="swal2-input custom_swal_input"/>
       <input type="text" id="taskDescription" placeholder="Short description (optional)" class="swal2-input custom_swal_input"/>
@@ -284,11 +284,11 @@ const BoardPage = () => {
               )}
             </div>
           ))}
-          <div className="rounded-full cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%] py-1" onClick={() => handleCreateNewTask(board.id, list.id)}>+ Create new task</div>
+          <div className="rounded-full cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%] py-1 text-blue-500" onClick={() => handleCreateNewTask(board.id, list.id)}>+ Create new task</div>
         </div>
       ))}
       <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board" onClick={() => handleCreateNewList()}>
-        <h1 className="text-1xl">+ Create new list</h1>
+        <h1 className="text-1xl text-blue-500">+ Create new list</h1>
       </div>
     </div>
   )
