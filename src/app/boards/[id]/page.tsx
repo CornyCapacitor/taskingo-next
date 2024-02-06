@@ -213,6 +213,8 @@ const BoardPage = () => {
       confirmButtonColor: "#2563eb",
       showCancelButton: true,
       cancelButtonText: "Cancel",
+      showDenyButton: true,
+      denyButtonText: "Delete task",
     }).then((result) => {
       if (result.isConfirmed) {
         const taskInput = document.getElementById('taskName') as HTMLInputElement
@@ -228,6 +230,8 @@ const BoardPage = () => {
         } else {
           editTask(boardId, listId, taskId, newTaskName, newDescription, newStatus)
         }
+      } else if (result.isDenied) {
+        handleDeleteTask(boardId, listId, taskId, taskName)
       } else {
         return
       }
@@ -251,6 +255,49 @@ const BoardPage = () => {
     const updatedBoards = boards
     updatedBoards[boardIndex].lists[listIndex].tasks[taskIndex] = {
       ...updatedBoards[boardIndex].lists[listIndex].tasks[taskIndex] = updatedTask
+    }
+
+    const updateData = async () => {
+      const { data } = await supabase
+        .from('users_boards')
+        .update({ 'boards': updatedBoards })
+        .eq('user_id', user?.id)
+        .select()
+
+      if (data) {
+        setBoards(data[0].boards)
+      }
+    }
+
+    updateData()
+  }
+
+  const handleDeleteTask = (boardId: string, listId: string, taskId: string, taskName: string) => {
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Are you sure you want to delete "${taskName}"? You can't revert this change.`,
+      showConfirmButton: true,
+      confirmButtonText: "Yes",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteTask(boardId, listId, taskId)
+      }
+    })
+  }
+
+  const deleteTask = (boardId: string, listId: string, taskId: string) => {
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
+
+    const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
+
+    const updatedBoards = boards
+    updatedBoards[boardIndex].lists[listIndex] = {
+      ...updatedBoards[boardIndex].lists[listIndex],
+      tasks: updatedBoards[boardIndex].lists[listIndex].tasks.filter(task => task.id !== taskId)
     }
 
     const updateData = async () => {
@@ -345,16 +392,11 @@ const BoardPage = () => {
   const deleteList = (boardId: string, listId: string) => {
     const boardIndex = boards?.findIndex(board => board.id === boardId)
 
-    const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
-
     const updatedBoards = boards
-    // updatedBoards[boardIndex].lists.filter(list => list.id !== listId)
     updatedBoards[boardIndex] = {
       ...updatedBoards[boardIndex],
       lists: updatedBoards[boardIndex].lists.filter(list => list.id !== listId)
     }
-
-    console.log(updatedBoards)
 
     const updateData = async () => {
       const { data } = await supabase
