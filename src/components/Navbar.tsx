@@ -41,7 +41,7 @@ export const Navbar = () => {
       <Link href={"/"} className="text-5xl">Taskingo</Link>
       <section className="flex w-[80px] justify-center">
         <div ref={dropdownRef} className="relative inline-block">
-          <Image src="hamburger.svg" alt="Dropdown menu" width={50} height={50} className={`hover:cursor-pointer border rounded-md p-2 ${toggleDropdown ? 'border-blue-500' : 'border-transparent'}`} onClick={() => setToggleDropdown(prev => !prev)} />
+          <Image src="/hamburger.svg" alt="Dropdown menu" width={50} height={50} className={`hover:cursor-pointer border rounded-md p-2 ${toggleDropdown ? 'border-blue-500' : 'border-transparent'}`} onClick={() => setToggleDropdown(prev => !prev)} />
           {toggleDropdown &&
             <ul className="absolute flex flex-col gap-3 rounded-md bg-gray-700 z-10 min-w-[250px] p-3 mt-2 right-0 text-center dropdown_reveal overflow-hidden">
               <Link className="w-full p-3 rounded-md bg-gray-800 text-white hover:bg-gray-600 focus:outline-none text-center" href={"/"}>Home</Link>

@@ -9,6 +9,34 @@ body {
   background-color: rgb(31, 41, 55);
 }
 
+.arrow_still {
+  animation: arrow_still 0.05s linear forwards;
+}
+
+@keyframes arrow_still {
+  from {
+    transform: rotate(-90deg);
+  }
+
+  to {
+    transform: rotate(0deg)
+  }
+}
+
+.arrow_rotate {
+  animation: arrow_rotation 0.05s linear forwards;
+}
+
+@keyframes arrow_rotation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-90deg);
+  }
+}
+
 .board_dropdown_reveal {
   animation: board_reveal 0.5s;
 }
