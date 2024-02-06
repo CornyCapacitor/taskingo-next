@@ -292,7 +292,7 @@ const BoardPage = () => {
           return
         }
       } else if (result.isDenied) {
-        handleDeleteList(boardId, listId)
+        handleDeleteList(boardId, listId, listName)
       } else {
         return
       }
@@ -325,8 +325,50 @@ const BoardPage = () => {
     updateData()
   }
 
-  const handleDeleteList = (boardId: string, listId: string) => {
-    return
+  const handleDeleteList = (boardId: string, listId: string, listName: string) => {
+    Swal.fire({
+      color: "#fff",
+      background: "#111827",
+      title: `Are you sure you want to delete "${listName}"? You can't revert this change.`,
+      showConfirmButton: true,
+      confirmButtonText: "Yes",
+      confirmButtonColor: "#2563eb",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteList(boardId, listId)
+      }
+    })
+  }
+
+  const deleteList = (boardId: string, listId: string) => {
+    const boardIndex = boards?.findIndex(board => board.id === boardId)
+
+    const listIndex = boards[boardIndex].lists.findIndex(list => list.id === listId)
+
+    const updatedBoards = boards
+    // updatedBoards[boardIndex].lists.filter(list => list.id !== listId)
+    updatedBoards[boardIndex] = {
+      ...updatedBoards[boardIndex],
+      lists: updatedBoards[boardIndex].lists.filter(list => list.id !== listId)
+    }
+
+    console.log(updatedBoards)
+
+    const updateData = async () => {
+      const { data } = await supabase
+        .from('users_boards')
+        .update({ 'boards': updatedBoards })
+        .eq('user_id', user?.id)
+        .select()
+
+      if (data) {
+        setBoards(data[0].boards)
+      }
+    }
+
+    updateData()
   }
 
   return (
