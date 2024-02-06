@@ -519,12 +519,14 @@ const BoardPage = () => {
   }
 
   return (
-    <div className="poppins w-screen flex flex-row flex-wrap items-start justify-center text-center text-white">
+    <div className="poppins w-screen flex flex-row flex-wrap items-start justify-center text-center text-white gap-2">
       {board && (
         <div className="flex text-center justify-between items-center w-full bg-black py-1 px-5">
           <h1 className="text-2xl">{board?.name}</h1>
           <div ref={dropdownRef} className="relative inline-block">
-            <Image src="hamburger.svg" alt="Dropdown menu" width={50} height={50} className={`hover:cursor-pointer border rounded-md p-2 z-1 ${toggleDropdown ? 'border-blue-500' : 'border-transparent'}`} onClick={() => setToggleDropdown(prev => !prev)} />
+            <div className={`h-[50px] w-[50px]flex items-center justify-center hover:cursor-pointer border rounded-md z-1 ${toggleDropdown ? 'border-blue-500' : 'border-transparent'}`}>
+              <Image className={`standard_transition ${toggleDropdown ? 'arrow_rotate' : 'arrow_still'}`} src="/arrow.svg" alt="Arrow icon" width={50} height={50} onClick={() => setToggleDropdown(prev => !prev)} />
+            </div>
             {toggleDropdown &&
               <ul className="absolute flex flex-col gap-3 rounded-md bg-gray-700 z-10 min-w-[250px] p-3 mt-2 right-0 text-center board_dropdown_reveal overflow-hidden">
                 <h1>Board options</h1>
@@ -556,7 +558,7 @@ const BoardPage = () => {
           <div className="rounded-full cursor-pointer hover:bg-gray-700 standard_transition bg-gray-800 w-[100%] py-1 text-blue-500" onClick={() => handleCreateNewTask(board.id, list.id)}>+ Create new task</div>
         </div>
       ))}
-      <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board mt-2" onClick={() => handleCreateNewList()}>
+      <div className="flex flex-col items-center justify-center rounded-full w-[350px] py-2 cursor-pointer standard_transition standard_board" onClick={() => handleCreateNewList()}>
         <h1 className="text-1xl text-blue-500">+ Create new list</h1>
       </div>
     </div>
