@@ -79,7 +79,7 @@ const SignupPage = () => {
           }
         })
       } catch (error) {
-        // setMessage(error)
+        console.error(error)
       }
     }
   }

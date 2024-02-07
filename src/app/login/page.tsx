@@ -100,7 +100,6 @@ const LoginPage = () => {
         <div className="bg-gray-900 p-8 rounded-lg shadow-md w-96 flex flex-col items-center justify-center gap-5">
           <h1 className="text-center text-2xl">Hello again <br /><span className="text-blue-600">{user?.user_metadata?.username}</span></h1>
           <button onClick={handleLogout} className="w-full p-3 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none">Logout</button>
-          <button onClick={() => console.log(user)} className="w-full p-3 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none">Console log user</button>
           <Link href="/" className="w-full p-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none text-center">To home page</Link>
         </div>
       </main>
