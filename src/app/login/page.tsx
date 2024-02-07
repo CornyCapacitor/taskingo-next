@@ -18,6 +18,10 @@ const LoginPage = () => {
   const router = useRouter()
   const supabase = createClientComponentClient();
 
+  useEffect(() => {
+    console.log(email)
+  }, [email])
+
   const LoginToast = Swal.mixin({
     toast: true,
     position: "top-end",
