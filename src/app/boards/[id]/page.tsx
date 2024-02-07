@@ -13,7 +13,6 @@ const BoardPage = () => {
   const [boards, setBoards] = useState<Board[]>([])
   const [board, setBoard] = useState<Board>()
   const [toggleDropdown, setToggleDropdown] = useState(false)
-  const [loadingMessage, setLoadingMessage] = useState('')
 
   const params = useParams()
   const dropdownRef = useRef<HTMLDivElement | null>(null)
