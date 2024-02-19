@@ -96,7 +96,7 @@ const LoginPage = () => {
 
   if (user) {
     return (
-      <main className="h-screen flex items-center justify-center bg-gray-800 p-6 text-white">
+      <main className="flex items-center justify-center bg-gray-800 p-6 text-white">
         <div className="bg-gray-900 p-8 rounded-lg shadow-md w-96 flex flex-col items-center justify-center gap-5">
           <h1 className="text-center text-2xl">Hello again <br /><span className="text-blue-600">{user?.user_metadata?.username}</span></h1>
           <button onClick={handleLogout} className="w-full p-3 rounded-md bg-gray-700 text-white hover:bg-gray-600 focus:outline-none">Logout</button>
@@ -107,7 +107,7 @@ const LoginPage = () => {
   }
 
   return (
-    <main className="h-screen flex items-center justify-center bg-gray-800 p-6 text-white">
+    <main className="flex items-center justify-center bg-gray-800 p-6 text-white">
       <div className="bg-gray-900 p-8 rounded-lg shadow-md w-96 flex flex-col items-center justify-center gap-5">
         <h1 className="text-3xl">Login</h1>
         {error &&

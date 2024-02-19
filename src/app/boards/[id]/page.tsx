@@ -570,7 +570,7 @@ const BoardPage = () => {
   }
 
   return (
-    <div className="poppins w-screen flex flex-row flex-wrap items-start justify-center text-center text-white gap-2">
+    <div className="pb-5 poppins w-screen flex flex-row flex-wrap items-start justify-center text-center text-white gap-2">
       {board && (
         <div className="flex text-center justify-between items-center w-full bg-black py-1 px-5">
           <h1 className="text-2xl">{board?.name}</h1>

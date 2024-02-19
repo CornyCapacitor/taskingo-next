@@ -85,7 +85,7 @@ const SignupPage = () => {
   }
 
   return (
-    <main className="h-screen flex items-center justify-center bg-gray-800 p-6 text-white">
+    <main className="flex items-center justify-center bg-gray-800 p-6 text-white">
       <div className="bg-gray-900 p-8 rounded-lg shadow-md w-96 flex flex-col items-center justify-center gap-5">
         <h1 className="text-3xl">Sign Up</h1>
         {errors.length > 0 &&
