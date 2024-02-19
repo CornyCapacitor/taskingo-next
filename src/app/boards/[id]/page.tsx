@@ -84,7 +84,7 @@ const BoardPage = () => {
     }
   }
 
-  const BoardToast = Swal.mixin({
+  const GeneralToast = Swal.mixin({
     toast: true,
     position: "top-end",
     showConfirmButton: false,
@@ -98,7 +98,6 @@ const BoardPage = () => {
       toast.onclick = () => Swal.close();
     }
   })
-
 
   // Board functions
 
@@ -139,12 +138,12 @@ const BoardPage = () => {
     const updatedBoards = boards
     updatedBoards[boardIndex].name = newBoardName
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
       title: 'Board updated'
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to update the board'
     })
@@ -178,12 +177,12 @@ const BoardPage = () => {
 
     const updatedBoards = boards.filter(board => board.id !== boardId)
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
       title: 'Board deleted'
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to delete the board'
     })
@@ -235,12 +234,12 @@ const BoardPage = () => {
       ...updatedBoards[boardIndex], lists: [...updatedBoards[boardIndex].lists, newList]
     }
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
-      title: `${listName} list created`
+      title: `${listName ? listName : "New"} list created`
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to create new list'
     })
@@ -290,12 +289,12 @@ const BoardPage = () => {
     const updatedBoards = boards
     updatedBoards[boardIndex].lists[listIndex].name = newListName
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
       title: 'List updated'
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to update the list'
     })
@@ -333,12 +332,12 @@ const BoardPage = () => {
       lists: updatedBoards[boardIndex].lists.filter(list => list.id !== listId)
     }
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
       title: 'List deleted'
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to delete the list'
     })
@@ -413,12 +412,12 @@ const BoardPage = () => {
       ...updatedBoards[boardIndex].lists[listIndex], tasks: [...updatedBoards[boardIndex].lists[listIndex].tasks, newTask]
     }
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
       title: 'Task created'
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to create new task'
     })
@@ -505,12 +504,12 @@ const BoardPage = () => {
       ...updatedBoards[boardIndex].lists[listIndex].tasks[taskIndex] = updatedTask
     }
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
       title: 'Task updated'
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to update the task'
     })
@@ -549,12 +548,12 @@ const BoardPage = () => {
       tasks: updatedBoards[boardIndex].lists[listIndex].tasks.filter(task => task.id !== taskId)
     }
 
-    const successToast = () => BoardToast.fire({
+    const successToast = () => GeneralToast.fire({
       icon: 'success',
       title: `Task deleted`
     })
 
-    const errorToast = () => BoardToast.fire({
+    const errorToast = () => GeneralToast.fire({
       icon: 'error',
       title: 'Failed to delete the task'
     })

@@ -5,6 +5,7 @@ import { authAtom } from "@/state/atoms"
 import { useAtom } from "jotai"
 import { useEffect, useState } from "react"
 
+import { GeneralToast } from "@/components/GeneralToast"
 import Swal from "sweetalert2"
 import supabase from "../config/supabaseClient"
 
@@ -53,7 +54,7 @@ const BoardsPage = () => {
 
     const updateData = async () => {
       // Updating data to database
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('users_boards')
         .update({ 'boards': updateValue })
         .eq('user_id', user?.id)
@@ -61,6 +62,17 @@ const BoardsPage = () => {
 
       if (data) {
         setBoards(data[0].boards)
+        GeneralToast.fire({
+          icon: 'success',
+          title: `${boardName ? boardName : "New"} board created`,
+        })
+      }
+
+      if (error) {
+        GeneralToast.fire({
+          icon: 'error',
+          title: 'Failed to create new board',
+        })
       }
     }
 
@@ -79,17 +91,14 @@ const BoardsPage = () => {
     }
 
     const fetchData = async () => {
-      // Fetching the data from database
       const { data } = await supabase
         .from('users_boards')
         .select()
         .eq('user_id', user?.id)
 
       if (data?.length) {
-        // If boards
         setBoards(data[0].boards)
       } else if (!data?.length) {
-        // If no boards
         createUserDatabase()
       }
     }
